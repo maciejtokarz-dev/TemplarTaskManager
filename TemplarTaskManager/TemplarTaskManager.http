@@ -1,0 +1,6 @@
+@TemplarTaskManager_HostAddress = http://localhost:5102
+
+GET {{TemplarTaskManager_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
