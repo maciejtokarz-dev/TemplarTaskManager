@@ -14,68 +14,85 @@ namespace TemplarTaskManager.Controllers
         {
             _context = context;
         }
+
+        // GET: api/Tasks
         [HttpGet]
-        public IActionResult getTasks()
+        public IActionResult GetTasks()
         {
             return Ok(_context.TodoItems.ToList());
         }
+
+        // GET: api/Tasks/5
         [HttpGet("{id}")]
         public IActionResult GetTask(int id)
         {
-            var znalezione_zadanie = _context.TodoItems.FirstOrDefault(x => x.Id == id);
+            var znalezione_zadanie = _context.TodoItems.Find(id); 
             if (znalezione_zadanie == null)
             {
                 return NotFound();
             }
             return Ok(znalezione_zadanie);
-
         }
 
+        // POST: api/Tasks
         [HttpPost]
-        public IActionResult CreateTask([FromBody]TodoItem noweZadanie)
+        public IActionResult CreateTask([FromBody] TodoItem noweZadanie)
         {
-            int maxId = _context.TodoItems.Any() ? _context.TodoItems.Max(z => z.Id): 0;
-            noweZadanie.Id = maxId + 1;
+            // Nie ustawiamy ID ręcznie! Baza zrobi to sama.
             _context.TodoItems.Add(noweZadanie);
+
+            // KLUCZOWE: Zapis do bazy
+            _context.SaveChanges();
+
             return CreatedAtAction(
                 nameof(GetTask),
-                new {id = noweZadanie.Id},
+                new { id = noweZadanie.Id }, // Tutaj noweZadanie.Id ma już wartość nadaną przez bazę
                 noweZadanie
             );
         }
 
+        // PUT: api/Tasks/5
         [HttpPut("{id}")]
         public IActionResult UpdateTask(int id, [FromBody] TodoItem zaktualizowaneZadanie)
         {
-            if(zaktualizowaneZadanie.Id != id)
+            if (id != zaktualizowaneZadanie.Id)
             {
-                return BadRequest("Podaj zgadzające się Id");
+                return BadRequest("ID w URL musi pasować do ID w ciele żądania");
             }
-            var znalezioneZadanie = _context.TodoItems.FirstOrDefault(x => x.Id == id);
 
-            if (znalezioneZadanie == null)
+            var istniejaceZadanie = _context.TodoItems.Find(id);
+
+            if (istniejaceZadanie == null)
             {
                 return NotFound();
             }
 
-            znalezioneZadanie.Opis = zaktualizowaneZadanie.Opis;
-            znalezioneZadanie.isCompleted = zaktualizowaneZadanie.isCompleted;
-            
-            return NoContent();
+            // Aktualizacja pól
+            istniejaceZadanie.Opis = zaktualizowaneZadanie.Opis;
+            istniejaceZadanie.isCompleted = zaktualizowaneZadanie.isCompleted;
 
+            // KLUCZOWE: Zapis do bazy
+            _context.SaveChanges();
+
+            return NoContent();
         }
 
+        // DELETE: api/Tasks/5
         [HttpDelete("{id}")]
         public IActionResult DeleteTask(int id)
         {
-            var znalezioneZadanie = _context.TodoItems.FirstOrDefault(x => x.Id == id);
-            if(znalezioneZadanie == null)
+            var zadanieDoUsuniecia = _context.TodoItems.Find(id);
+            if (zadanieDoUsuniecia == null)
             {
                 return NotFound();
             }
-            _context.TodoItems.Remove(znalezioneZadanie);
+
+            _context.TodoItems.Remove(zadanieDoUsuniecia);
+
+            // KLUCZOWE: Zapis do bazy
+            _context.SaveChanges();
+
             return NoContent();
         }
-        
     }
 }
