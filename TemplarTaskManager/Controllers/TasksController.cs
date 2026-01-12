@@ -75,7 +75,7 @@ namespace TemplarTaskManager.Controllers
             }
             _context.TodoItems.Remove(znalezioneZadanie);
             return NoContent();
-        }//test commita
+        }
         
     }
 }
