@@ -71,7 +71,7 @@ namespace TemplarTaskManager.Controllers
             istniejaceZadanie.Opis = zaktualizowaneZadanie.Opis;
             istniejaceZadanie.isCompleted = zaktualizowaneZadanie.isCompleted;
 
-            // KLUCZOWE: Zapis do bazy
+            // KLUCZOWE:  Zapis do bazy
             _context.SaveChanges();
 
             return NoContent();
